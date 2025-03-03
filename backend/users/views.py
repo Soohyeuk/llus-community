@@ -47,7 +47,7 @@ class LoginView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class UserDetailView(APIView):
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     def get(self, request, id, *args, **kwargs):
         """Returns the details of the user with the specified ID, based on role."""
