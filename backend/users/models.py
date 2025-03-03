@@ -19,12 +19,12 @@ class User(AbstractUser):
     email = models.EmailField(unique=True)
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
     birth_date = models.DateField()
-    school = models.CharField(max_length=255)
-    grad_date = models.IntegerField()
+    school = models.CharField(max_length=255, default='')
+    grad_date = models.IntegerField(default=0)
     role = models.CharField(max_length=5, choices=ROLE_CHOICES)
     created_at = models.DateTimeField(auto_now_add=True)
     
-    REQUIRED_FIELDS = ['username', 'major', 'us_phone_number', 'gender', 'birth_date', 'school', 'generation', 'role']
+    REQUIRED_FIELDS = ['major', 'us_phone_number', 'gender', 'birth_date', 'school', 'generation', 'role']
 
     def save(self, *args, **kwargs):
         self.clean()
