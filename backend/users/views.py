@@ -12,6 +12,11 @@ from rest_framework.exceptions import NotFound
 
 User = get_user_model()
 
+class HomeView(APIView):
+    def get(self, request):
+        return Response({"message": "Welcome to the API. Available endpoints: /signup, /login, /profile/{id}, /logout, /refresh"}, status=200)
+  
+
 class SignupView(CreateAPIView):
     serializer_class = UserSerializer
     permission_classes = [AllowAny]
@@ -42,17 +47,16 @@ class LoginView(APIView):
                     'role': user.role,
                     'school': user.school,
                     'grad_date': user.grad_date,
+                      'english_name': user.english_name,  
+                    'us_phone_number': user.us_phone_number,  
+                    'birth_date': user.birth_date,  
                 }
             }, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class UserDetailView(APIView):
-    # permission_classes = [IsAuthenticated]
-
     def get(self, request, id, *args, **kwargs):
-        """Returns the details of the user with the specified ID, based on role."""
         try:
-            # Fetch the user by ID
             user = User.objects.get(id=id)
         except User.DoesNotExist:
             raise NotFound(detail="User not found")
@@ -60,6 +64,7 @@ class UserDetailView(APIView):
         user_serializer = UserSerializer(user)
         return Response(user_serializer.data, status=status.HTTP_200_OK)
 
+# LogoutView remains the same, as it doesn't depend on user fields
 class LogoutView(APIView):
     permission_classes = [IsAuthenticated]
 

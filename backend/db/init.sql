@@ -12,5 +12,5 @@ CREATE TABLE users (
     school VARCHAR(255) NOT NULL, /* 학교 */
     grad_date INT NOT NULL, 
     role ENUM('user', 'admin') NOT NULL, /* 역할 */
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
