@@ -5,49 +5,50 @@ import { useNavigate } from "react-router-dom";
 function Signup() {
 // 시간 지날수록 바꿀수 있는 것들 마지막 업데이트로 되어있는걸 볼수있게함
   const [username, setUsername] = useState("");
-  const [englishName, setEnglishName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [usPhoneNumber, setUsPhoneNumber] = useState("");
   const [email, setEmail] = useState("");
   const [gender, setGender] = useState("");
   const [birthDate, setBirthDate] = useState("");
-  const [school, setSchool] = useState("");
   const [gradDate, setGradDate] = useState("");
-  const [role, setRole] = useState("user");
   const [password, setPassword] = useState("");
+  const [major, setMajor] = useState("");
+  const [error, setError] = useState(null);
+
   const navigate = useNavigate();
 
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault(); // Prevent form from refreshing the page on submit
-
     // user is an object that holds all the state varible and try to send all of those to the backend instead of sending one by one
     const user = {
       username,
-      english_name: englishName,
+      first_name: firstName,
+      last_name:lastName,
       us_phone_number: usPhoneNumber,
       email,
       gender,
       birth_date: birthDate,
-      school,
       grad_date: gradDate,
-      role,
+      major,
       password,
-      
+
     };
-
+    console.log("Sending Sighnup Request: ", user);
+    // Log the request before sending
     try {
-      // Try to send the user object to the backend
-      const response = await axios.post("http://localhost:8000/signup/", user);
-      
-      // successful then go to the login page
-      navigate("/login");
-
-      // successful
-      console.log("우리의 동료가 된걸 축하한다",response.data.message);
-    } catch (error) {
-      // Failed
-      console.error("안타깝지만 동료는 되지 못할거같다 다시 입력해라", error.response.data);
+        // ✅ Step 1: Signup the user
+        await axios.post("http://localhost:8000/signup/", user);
+        console.log("🎉 동료가 된걸 축하한다!");
+        navigate("/");
     }
+    catch(error){
+      console.error("회원가입 실패", error.response?.data);
+      setError(error.response?.data || "회원가입 실패")
+
+    }
+  
   };
 
   return (
@@ -65,18 +66,27 @@ function Signup() {
         </label>
         <br />
         <label>
-          English Name:
+          First Name:
           <input
             type="text"
-            value={englishName}
-            onChange={(e) => setEnglishName(e.target.value)}
+            value={firstName}
+            onChange={(e) => setFirstName(e.target.value)}
+          />
+        </label>
+        <br/>
+        <label>
+          Last Name:
+          <input
+            type="text"
+            value={lastName}
+            onChange={(e) => setLastName(e.target.value)}
           />
         </label>
         <br />
         <label>
           US Phone Number:
           <input
-            type="text"
+            type="tel"
             value={usPhoneNumber}
             onChange={(e) => setUsPhoneNumber(e.target.value)}
           />
@@ -88,6 +98,7 @@ function Signup() {
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            required
           />
         </label>
         <br />
@@ -109,15 +120,7 @@ function Signup() {
             type="date"
             value={birthDate}
             onChange={(e) => setBirthDate(e.target.value)}
-          />
-        </label>
-        <br />
-        <label>
-          School:
-          <input
-            type="text"
-            value={school}
-            onChange={(e) => setSchool(e.target.value)}
+            required
           />
         </label>
         <br />
@@ -127,18 +130,17 @@ function Signup() {
             type="number"
             value={gradDate}
             onChange={(e) => setGradDate(e.target.value)}
+            required
           />
         </label>
         <br />
         <label>
-          Role:
-          <select
-            value={role}
-            onChange={(e) => setRole(e.target.value)}
-          >
-            <option value="user">User</option>
-            <option value="admin">Admin</option>
-          </select>
+          Major:
+          <input
+            type="text"
+            value={major}
+            onChange={(e) => setMajor(e.target.value)} 
+          />
         </label>
         <br />
 
@@ -150,7 +152,7 @@ function Signup() {
             onChange={(e) => setPassword(e.target.value)} 
           />
         </label>
-        
+
         <br />
         <button type="submit">동료가 되겠습니까?</button>
       </form>

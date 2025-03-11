@@ -1,40 +1,38 @@
 from django.contrib.auth import get_user_model
-from rest_framework import serializers
-from django.contrib.auth import authenticate
+from rest_framework import serializers # To create serializers
+from .models import User # Custom user model from models.py
+from django.contrib.auth import authenticate # Verify username and email and password
+
+
 
 User = get_user_model()
 
-class UserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = [
-            'id', 'username', 'email', 'english_name', 'us_phone_number',
-            'gender', 'birth_date', 'school', 'grad_date', 'role', 'created_at', 'password'
+class UserSerializer(serializers.ModelSerializer): # This serializer translates between the user model instances and JSON representation
+    #mdoelserializer automatically creates serilzation fields based on your model fields
+    class Meta: 
+        model = User # Links serializer directly to your custom user model
+        fields = [ # Allowed for serialization and desrialization 
+            'id', 'username', 'email', 'first_name', 'last_name', 'us_phone_number',
+            'gender', 'birth_date', 'grad_date', 'role', 'created_at', 'major', 'password'
         ]
-        extra_kwargs = {'password': {'write_only': True}}
+        extra_kwargs = {'password': {'write_only': True}} # Provides extra settings (here, password will only be accepted when creating/updating users but never sent back.)
 
-    def validate(self, data):
-        """ Validates the role of the user when creating a user """
-        role = data.get('role')
+    def validate_username(self, value):
+        """ Ensure username is unique """
+        if User.objects.filter(username=value).exists():
+            raise serializers.ValidationError("Username already exists.")
+        return value
 
-        if role == 'user': 
-            required_fields = ['school', 'grad_date']
-            forbidden_fields = []
-        elif role == 'admin': 
-            required_fields = []
-            forbidden_fields = ['school', 'grad_date']
-        else:
-            raise serializers.ValidationError("Invalid role.")
-        
-        for field in required_fields:
-            if not data.get(field):
-                raise serializers.ValidationError({field: f"{field} is required for {role}."})
-
-        for field in forbidden_fields:
-            if data.get(field):
-                raise serializers.ValidationError({field: f"{field} is not allowed for {role}."})
-
-        return data
+    def validate_email(self, value):
+        """ Ensure email is unique """
+        if User.objects.filter(email=value).exists():
+            raise serializers.ValidationError("Email already registered.")
+        return value
+    
+    def validate_us_phone_number(self, value):
+        if User.objects.filter(us_phone_number=value).exists():
+            raise serializers.ValidationError("The phone number already exist")
+        return value
 
     def create(self, validated_data):
         """ Creates user with hashed password. """
@@ -46,14 +44,3 @@ class UserSerializer(serializers.ModelSerializer):
         return user
 
 
-class LoginSerializer(serializers.Serializer):
-    username = serializers.CharField()
-    password = serializers.CharField()
-    email = serializers.EmailField()
-
-    def validate(self, data):
-        user = authenticate(username=data['username'], password=data['password'])
-        if user is None:
-            raise serializers.ValidationError("Invalid credentials")
-        data['user'] = user
-        return data
