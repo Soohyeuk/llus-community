@@ -32,6 +32,13 @@ ALLOWED_HOSTS = []
 
 # Application definition
 
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',  # Use JWT for API
+    ),
+}
+
+
 INSTALLED_APPS = [
     "corsheaders",  
     "rest_framework",
@@ -41,6 +48,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    'rest_framework_simplejwt',
     "users",
     "post",
 ]
